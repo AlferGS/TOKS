@@ -1,0 +1,10 @@
+D:\Projects C#\Toks\com2com\com2com\bin\Debug\com2com.exe
+D:\Projects C#\Toks\com2com\com2com\bin\Debug\com2com.exe.config
+D:\Projects C#\Toks\com2com\com2com\obj\Debug\com2com.Properties.Resources.resources
+D:\Projects C#\Toks\com2com\com2com\obj\Debug\com2com.csproj.GenerateResource.cache
+D:\Projects C#\Toks\com2com\com2com\obj\Debug\com2com.csproj.CoreCompileInputs.cache
+D:\Projects C#\Toks\com2com\com2com\obj\Debug\com2com.exe
+D:\Projects C#\Toks\com2com\com2com\obj\Debug\com2com.pdb
+D:\Projects C#\Toks\com2com\com2com\bin\Debug\com2com.pdb
+D:\Projects C#\Toks\com2com\com2com\obj\Debug\com2com.com2com.resources
+D:\Projects C#\Toks\com2com\com2com\obj\Debug\com2com.csproj.AssemblyReference.cache
