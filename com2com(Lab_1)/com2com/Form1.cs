@@ -16,11 +16,11 @@ namespace com2com
 {
     public partial class com2com : Form
     {
-
         SerialPort comPort;
         Thread readThread;
         String portName;
-        bool flg = true;
+        Semaphore portSem = new Semaphore(1,2);
+        int GUIflag = 0;
         public com2com()
         {
             InitializeComponent();
@@ -28,19 +28,17 @@ namespace com2com
 
             string[] ports = SerialPort.GetPortNames();
             Debug.Text = "";
-            for (int i = 0; i < ports.Length; i++)                   // Add Ports names in ComboBox
-            {
+            for (int i = 0; i < ports.Length; i++){
                 Debug.Text += "i = " + i + "  " + ports[i] + "\n";
                 ComboBox.Items.Add(ports[i]);
             }
-            for (int i = 0; i < ports.Length; i++)                  //Choose first port 
-            {
+
+            for (int i = 0; i < ports.Length; i++){
                 ComboBox.SelectedIndex = i;
+                GUIflag--;
                 comPort = new SerialPort(ports[i]);
-                if (comPort.IsOpen == false)
-                {
-                    try
-                    {
+                if (comPort.IsOpen == false) {
+                    try{
                         portName = ComboBox.SelectedItem.ToString();
                         comPort.Open();
                     }catch (UnauthorizedAccessException) { continue; }
@@ -54,31 +52,20 @@ namespace com2com
         }
 
         private void read(){                                        // Thread for check new message in port
-            while (readThread.ThreadState.ToString() != "WaitSleepJoin" && readThread.ThreadState.ToString() != "Aborted")
-            {
+            while (true){
+                        portSem.WaitOne();
                 Console.WriteLine("..."+readThread.ThreadState.ToString()+ "...");
                 try{
                     if (comPort.IsOpen){
-                        Console.WriteLine("comport is open\n");
-                        string portname = comPort.PortName;
                         string readLine = comPort.ReadLine();
                         OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Items.Add(readLine); });
                     }
                 }
-                catch (TimeoutException e) { Console.WriteLine("TimeoutException -... " + e.Message); }
-                catch (ObjectDisposedException ) {
-                    //System.Threading.Timer t = new System.Threading.Timer(null, null, 1000, 1);
-                    Console.WriteLine("ObjectDisposedException \n");
-                    Thread.Sleep(1000);
-                    flg = false;
-                }
-                //catch (InvalidOperationException IOE) { Console.WriteLine("InvalidOperationException (Port closed) - " + IOE.Message); }
+                catch (TimeoutException e)       { Console.WriteLine("TimeoutException -... " + e.Message); }
+                catch (ObjectDisposedException ) { Console.WriteLine("ObjectDisposedException \n"); }
                 
-                while(flg == false){
-                    Console.WriteLine("flg == false\n");
-                    Thread.Sleep(100000);
-                    flg = true;
-                }
+                        portSem.Release();
+                Thread.Sleep(1000);
             }
         }
         private void SendButton_Click(object sender, EventArgs e){
@@ -99,7 +86,6 @@ namespace com2com
         public void Com2com_FormClosing(object sender, FormClosingEventArgs e){
             readThread.Abort();
             comPort.Close();
-            //Application.Exit();
             System.Environment.Exit(0);
             System.Environment.FailFast("Exit Error!");
         }
@@ -108,43 +94,35 @@ namespace com2com
         //PortName сохраняет имя нового порта, отключаемся от старого порта
         //и пытемся подключится к новому. если не получается, то подключаемся к старому
         private void ComboBox_SelectedIndexChanged_1(object sender, EventArgs e){
+            GUIflag++;
             string tmp_name = portName;
             portName = ComboBox.SelectedItem.ToString();
-            if (comPort != null){
-                try
-                {
-                    Console.WriteLine(readThread.ThreadState.ToString());
-                    readThread.Abort();
-                    Console.WriteLine(readThread.ThreadState.ToString());
-                    //flg = false;
-                    Thread.Sleep(10000);
-
-                    readThread.Interrupt();
-                    Console.WriteLine(readThread.IsAlive.ToString());
-
-                    comPort.Close();
-                    comPort = new SerialPort(portName);
-                    comPort.Open();
-                    //readThread.Abort();
-                    readThread = new Thread(read);
-                    Console.WriteLine(readThread.ThreadState.ToString());
-                    readThread.Start();
-                    Console.WriteLine(readThread.ThreadState.ToString());
-                    //flg = true;
-
-                }
-                catch (System.Threading.ThreadAbortException exception) {
-                    Console.WriteLine("Abort exception - " + exception.Message);
-                }
-                catch (UnauthorizedAccessException)
-                {
-                    comPort.Close();
-                    comPort = new SerialPort(tmp_name);
-                    comPort.Open();
-                    //readThread = new Thread(read);
-                    readThread.Start();
-                    ComboBox.SelectedItem = tmp_name;
-                    Debug.Text = "Com Port is Closed. \nConnect to " + tmp_name;
+            if (comPort != null && GUIflag == 1){
+                GUIflag--;
+                try{
+                    while (true){
+                        if (portSem.WaitOne(1)){
+                            comPort.Close();
+                            comPort = new SerialPort(portName);
+                            comPort.Open();
+                            portSem.Release();
+                            break;
+                        }
+                    }
+                }catch (UnauthorizedAccessException){
+                    while (true){
+                        comPort.Close();
+                        comPort = new SerialPort(tmp_name);
+                        comPort.Open();
+                        portSem.Release();
+                        Debug.Text = "Com Port is Closed. \nConnect to " + tmp_name;
+                        GUIflag--;
+                        ComboBox.SelectedItem = tmp_name;
+                        //portSem.Release();
+                        break;
+                    }
+                //catch (System.Threading.ThreadAbortException exception) {
+                //      Console.WriteLine("Abort exception - " + exception.Message);}
                 }
             }
         }
