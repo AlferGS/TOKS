@@ -39,8 +39,10 @@ namespace com2com
             // InputBox
             // 
             this.InputBox.Location = new System.Drawing.Point(12, 12);
+            this.InputBox.Multiline = true;
             this.InputBox.Name = "InputBox";
-            this.InputBox.Size = new System.Drawing.Size(288, 22);
+            this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.InputBox.Size = new System.Drawing.Size(288, 106);
             this.InputBox.TabIndex = 0;
             // 
             // ComboBox
@@ -73,11 +75,12 @@ namespace com2com
             // 
             // OutputBox
             // 
+            this.OutputBox.Enabled = false;
             this.OutputBox.FormattingEnabled = true;
             this.OutputBox.ItemHeight = 16;
-            this.OutputBox.Location = new System.Drawing.Point(12, 108);
+            this.OutputBox.Location = new System.Drawing.Point(12, 124);
             this.OutputBox.Name = "OutputBox";
-            this.OutputBox.Size = new System.Drawing.Size(288, 132);
+            this.OutputBox.Size = new System.Drawing.Size(288, 116);
             this.OutputBox.TabIndex = 4;
             // 
             // com2com
