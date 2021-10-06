@@ -177,6 +177,11 @@ namespace com2com
             System.Environment.Exit(0);
             System.Environment.FailFast("Exit Error!");
         }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
     }
 }
             //    try {
