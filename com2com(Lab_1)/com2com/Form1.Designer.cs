@@ -50,6 +50,7 @@ namespace com2com
             this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.InputBox.Size = new System.Drawing.Size(341, 104);
             this.InputBox.TabIndex = 0;
+            this.InputBox.TextChanged += new System.EventHandler(this.InputBox_TextChanged);
             // 
             // ComboBox
             // 
