@@ -29,12 +29,14 @@ namespace com2com
             this.FormClosing += Com2com_FormClosing;
 
             Debug.Text = "";                                            //Add ports in ComboBox
+            ComboBox.Items.Add("Null");
             for (int i = 0; i < ports.Length; i++){
                 Debug.Text += "i = " + i + "  " + ports[i] + "\n";
                 ComboBox.Items.Add(ports[i]);
             }
-
-            for (int i = 0; i < ports.Length; i++){                     //Get first available port
+            ComboBox.SelectedItem = "Null";
+            GUIflag--;
+            /*for (int i = 0; i < ports.Length; i++){                     //Get first available port
                 ComboBox.SelectedIndex = i;
                 GUIflag--;
                 comPort = new SerialPort(ports[i]);
@@ -46,14 +48,15 @@ namespace com2com
                     i = ports.Length + 1;
                     break;
                 }
-            }
-            comPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived);
+            }*/
+            //comPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived);
             readThread = new Thread(read);
             readThread.Start();
         }
 
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e) {        //if received messasge in port, signal to read it
             canRead = true;
+            Debug.Text = "got message";
         }
 
         private void read() {                                        // Thread for check new message in port
@@ -80,31 +83,46 @@ namespace com2com
             GUIflag++;
             string tmp_name = portName;
             portName = ComboBox.SelectedItem.ToString();
-            if (comPort != null && GUIflag == 1) {
-                GUIflag--;
-                try {
-                    mutex.WaitOne();
-                    comPort.Close();
-                    comPort = new SerialPort(portName);
-                    comPort.Open();
-                }
-                catch (UnauthorizedAccessException) {
-                    comPort.Close();
-                    comPort = new SerialPort(tmp_name);
-                    comPort.Open();
-                    Debug.Text = "Com Port is Closed. \nConnect to " + tmp_name;
+            if (portName != "Null")
+            {
+                if (GUIflag == 1)
+                {
                     GUIflag--;
-                    ComboBox.SelectedItem = tmp_name;
+                    try
+                    {
+                        mutex.WaitOne();
+                        if (comPort != null) { comPort.Close(); }
+                        comPort = new SerialPort(portName);
+                        comPort.Open();
+                        Debug.Text = "Select " + portName;
+                    }
+                    catch (UnauthorizedAccessException)
+                    {
+                        comPort.Close();
+                        comPort = new SerialPort(tmp_name);
+                        comPort.Open();
+                        Debug.Text = "Com Port is Closed. \nConnect to " + tmp_name;
+                        GUIflag--;
+                        ComboBox.SelectedItem = tmp_name;
+                    }
+                    catch (IOException) { Debug.Text = "The port response time has expired. \nConnect to " + tmp_name; GUIflag--; ComboBox.SelectedItem = tmp_name; }
+                    finally { mutex.ReleaseMutex(); comPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived); }
                 }
-                catch (IOException) { Debug.Text = "The port response time has expired. \nConnect to " + tmp_name; GUIflag--; ComboBox.SelectedItem = tmp_name;  }
-                finally { mutex.ReleaseMutex(); }
             }
         }
 
         private void SendButton_Click(object sender, EventArgs e){
-            string writeLine = Convert.ToString(InputBox.Text);
-            comPort.WriteLine(writeLine);
-            InputBox.Text = "";
+            if (portName != "Null")
+            {
+                string writeLine = Convert.ToString(InputBox.Text);
+                comPort.WriteLine(writeLine);
+                InputBox.Text = "";
+                Debug.Text = "send message";
+            }
+            else
+            {
+                MessageBox.Show("Select com port", "Warning", MessageBoxButtons.YesNo);
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e){
@@ -129,12 +147,17 @@ namespace com2com
         }
 
         private void InputBox_TextChanged(object sender, EventArgs e) {                 //Send message if click enter 
-            if (InputBox.Text.Length > 0) {
+            if (InputBox.Text.Length > 0 && portName != "Null") {
                 if (InputBox.Text[InputBox.Text.Length - 1] == '\n' && InputBox.Text.TrimEnd('\r', '\n') != "") {
-                    string message = Convert.ToString(InputBox.Text);
+                    string message = Convert.ToString(InputBox.Text.TrimEnd('\r','\n'));
                     comPort.WriteLine(message);
                     InputBox.Text = null;
+                    Debug.Text = "send message";
                 }
+            }
+            else if(portName == "Null")
+            {
+                MessageBox.Show("Select com port", "Warning", MessageBoxButtons.YesNo);
             }
         }
     }
