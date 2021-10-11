@@ -12,6 +12,7 @@ namespace com2com
 {
     static class Program
     {
+       
             /// <summary>
             /// Главная точка входа для приложения.
             /// </summary>
@@ -22,5 +23,6 @@ namespace com2com
                 Application.SetCompatibleTextRenderingDefault(false);
                 Application.Run(new com2com());
             }
+        
     }
 }
