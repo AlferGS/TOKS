@@ -17,8 +17,7 @@ namespace com2com
         static bool canRead = false;
         static Mutex mutex = new Mutex();
         static string[] ports = SerialPort.GetPortNames();
-        public com2com()
-        {
+        public com2com() {
             InitializeComponent();
             this.FormClosing += Com2com_FormClosing;
 
@@ -30,7 +29,7 @@ namespace com2com
             readThread = new Thread(read);
             readThread.Start();
         }
-               private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e) {        //if received messasge in port, signal to read it
+        private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e) {        //if received messasge in port, signal to read it
             canRead = true;
             Debug.Text = "Got message";
         }
@@ -85,11 +84,9 @@ namespace com2com
             if(portName == "Null" && tmp_name != null) { comPort.Close(); }
         }
 
-        private void SendButton_Click(object sender, EventArgs e){
-            if (portName != "Null")
-            {
-                try
-                {
+        private void SendButton_Click(object sender, EventArgs e) {
+            if (portName != "Null") {
+                try {
                     string writeLine = Convert.ToString(InputBox.Text);
                     comPort.WriteLine(writeLine);
                     InputBox.Text = "";
@@ -98,8 +95,7 @@ namespace com2com
                 catch (TimeoutException) { Debug.Text = "Time for send is out";  }
                 catch (InvalidOperationException) { Debug.Text = "Port is Closed. Select another port"; }
             }
-            else
-            {
+            else {
                 Debug.Text = "Select Com port";
             }
         }

@@ -83,6 +83,7 @@ namespace com2com
             // OutputBox
             // 
             this.OutputBox.FormattingEnabled = true;
+            this.OutputBox.HorizontalScrollbar = true;
             this.OutputBox.ItemHeight = 16;
             this.OutputBox.Location = new System.Drawing.Point(0, 21);
             this.OutputBox.Name = "OutputBox";
@@ -129,6 +130,8 @@ namespace com2com
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "com2com";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Com2com_FormClosing);
             this.groupBox1.ResumeLayout(false);
