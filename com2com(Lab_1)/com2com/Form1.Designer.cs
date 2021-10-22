@@ -57,6 +57,7 @@ namespace com2com
             // 
             // ComboBox
             // 
+            this.ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ComboBox.FormattingEnabled = true;
             this.ComboBox.Location = new System.Drawing.Point(198, 21);
             this.ComboBox.Name = "ComboBox";
@@ -118,7 +119,7 @@ namespace com2com
             this.groupBox3.Size = new System.Drawing.Size(452, 139);
             this.groupBox3.TabIndex = 5;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Control/Debug";
+            this.groupBox3.Text = "Debug&&Control";
             // 
             // updatePortsButton
             // 
@@ -145,6 +146,7 @@ namespace com2com
             this.Debug.AutoSize = true;
             this.Debug.Location = new System.Drawing.Point(6, 21);
             this.Debug.Name = "Debug";
+            this.Debug.ReadOnly = true;
             this.Debug.Size = new System.Drawing.Size(186, 110);
             this.Debug.TabIndex = 9;
             this.Debug.Text = "";
@@ -156,7 +158,9 @@ namespace com2com
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(494, 481);
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(494, 481);
             this.Name = "com2com";
             this.Text = "com2com";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Com2com_FormClosing);

@@ -36,8 +36,8 @@ namespace com2com
                     InputBox.Text = "";
                     Debug.Text = "Send message";
                 }
-                catch (TimeoutException) { Debug.Text = "Time for send a message is out";  }
                 catch (InvalidOperationException) { Debug.Text = portName + " is busy. Select another port"; }
+                catch (TimeoutException) { Debug.Text = "Time for send a message is out";  }
             }
             else {
                 Debug.Text = "Select Com port";
@@ -52,8 +52,8 @@ namespace com2com
                         InputBox.Text = "";
                         Debug.Text = "Send message";
                     }
-                    catch (TimeoutException) { Debug.Text = "Time for send a message is out"; }
                     catch (InvalidOperationException) { Debug.Text = portName + " is busy. Select another port"; }
+                    catch (TimeoutException) { Debug.Text = "Time for send a message is out"; }
                 }
             }
             else if(portName == "Null") {
@@ -93,21 +93,24 @@ namespace com2com
                         comPort.Encoding = Encoding.Unicode;
                         comPort.Open();
                         Debug.Text = "Select " + portName;
+                        InputBox.Enabled = true;
                     }
                     catch (UnauthorizedAccessException) {
                         comPort.Close();
                         comPort = new SerialPort(tmp_name, 9600, Parity.None, 8, StopBits.One);
                         comPort.Encoding = Encoding.Unicode;
-                        comPort.Open();
+                        if (tmp_name != "Null") { comPort.Open(); }
                         Debug.Text = portName + " is busy. \nConnect to " + tmp_name;
                         GUIflag--;
                         ComboBox.SelectedItem = tmp_name;
+                        if (tmp_name == "Null") { InputBox.Enabled = false; }
+                        else { InputBox.Enabled = true; }
                     }
-                    catch (IOException) { Debug.Text = "The port response time has expired. \nConnect to " + tmp_name; GUIflag--; ComboBox.SelectedItem = tmp_name; }
-                    finally { mutex.ReleaseMutex(); comPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived); InputBox.Enabled = true; }
+                    catch (IOException) { Debug.Text = "The port response time has expired. \nConnect to " + tmp_name; GUIflag--; ComboBox.SelectedItem = tmp_name; }     //fix
+                    finally { mutex.ReleaseMutex(); comPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived); }
                 }
             }
-            if(portName == "Null" && tmp_name == "Null") { GUIflag--; return; } 
+            if(portName == "Null" && tmp_name == "Null") { GUIflag = 0; return; } 
             if(portName == "Null" && tmp_name != null) { comPort.Close(); GUIflag--; InputBox.Enabled = false; }
         }
         public void Com2com_FormClosing(object sender, FormClosingEventArgs e){
@@ -128,7 +131,7 @@ namespace com2com
             ComboBox.Items.AddRange(ports);
             GUIflag = 0;
             ComboBox.SelectedItem = "Null";
-            Debug.Text = "Port list has been updated";
+            Debug.Text = "Port list was updated";
         }
     }
 }
