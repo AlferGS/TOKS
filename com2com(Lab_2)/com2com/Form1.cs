@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using System.IO;
@@ -23,23 +17,52 @@ namespace com2com
         static bool canRead = false;
         static Mutex mutex = new Mutex();
         static string[] ports = SerialPort.GetPortNames();
-        public com2com()
-        {
+        public com2com() {
             InitializeComponent();
             this.FormClosing += Com2com_FormClosing;
-
             Debug.Text = "";                                            //Add ports in ComboBox
-            ComboBox.Items.Add("None");
+            ComboBox.Items.Add("Null");
             ComboBox.Items.AddRange(ports);
-            ComboBox.SelectedItem = "None";
+            ComboBox.SelectedItem = "Null";
             GUIflag--;
             readThread = new Thread(read);
             readThread.Start();
         }
-
+        private void SendButton_Click(object sender, EventArgs e) {
+            if (portName != "Null") {
+                try {
+                    string writeLine = Convert.ToString(InputBox.Text);
+                    comPort.WriteLine(writeLine);
+                    InputBox.Text = "";
+                    Debug.Text = "Send message";
+                }
+                catch (InvalidOperationException) { Debug.Text = portName + " is busy. Select another port"; }
+                catch (TimeoutException) { Debug.Text = "Time for send a message is out";  }
+            }
+            else {
+                Debug.Text = "Select Com port";
+            }
+        }
+        private void InputBox_TextChanged(object sender, EventArgs e) {                 //Send message if click enter 
+            if (InputBox.Text.Length > 0 && portName != "Null") {
+                if (InputBox.Text[InputBox.Text.Length - 1] == '\n' && InputBox.Text.TrimEnd('\r', '\n') != "") {
+                    try {
+                        string message = Convert.ToString(InputBox.Text.TrimEnd('\r', '\n'));
+                        comPort.WriteLine(message);
+                        InputBox.Text = "";
+                        Debug.Text = "Send message";
+                    }
+                    catch (InvalidOperationException) { Debug.Text = portName + " is busy. Select another port"; }
+                    catch (TimeoutException) { Debug.Text = "Time for send a message is out"; }
+                }
+            }
+            else if(portName == "Null") {
+                Debug.Text = "Select Com port";
+            }
+        }
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e) {        //if received messasge in port, signal to read it
             canRead = true;
-            Debug.Text = "got message";
+            Debug.Text = "Got message";
         }
 
         private void read() {                                        // Thread for check new message in port
@@ -50,105 +73,76 @@ namespace com2com
                         OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Items.Add(comPort.ReadLine()); });
                         mutex.ReleaseMutex();
                     }
-                    catch (TimeoutException e)      { Console.WriteLine("TimeoutException -... " + e.Message); }
-                    catch (ObjectDisposedException) { Console.WriteLine("ObjectDisposedException \n"); }
+                    catch (TimeoutException e)        { Debug.Invoke((MethodInvoker)delegate { Debug.Text = "TimeoutException - " + e.Message; }); }
+                    catch (ObjectDisposedException e) { Debug.Invoke((MethodInvoker)delegate { Debug.Text = "ObjectDisposedException - " + e.Message; }); }
                     finally { canRead = false; }
                 }
-                else { Thread.Sleep(1000); }
             }
         }
-
-        //portName - хранит текущий порт, tmp_port - старый порт 
-        //PortName сохраняет имя нового порта, отключаемся от старого порта
-        //и пытемся подключится к новому. если не получается, то подключаемся к старому
         private void ComboBox_SelectedIndexChanged_1(object sender, EventArgs e) {                      
             GUIflag++;
             string tmp_name = portName;
             portName = ComboBox.SelectedItem.ToString();
-            if (portName != "None") {
+            if (portName != "Null") {
                 if (GUIflag == 1) {
                     GUIflag--;
                     try {
                         mutex.WaitOne();
                         if (comPort != null) { comPort.Close(); }
-                        comPort = new SerialPort(portName, 9600, Parity.None, 416, StopBits.One);
+                        comPort = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One);
                         comPort.Encoding = Encoding.Unicode;
                         comPort.Open();
                         Debug.Text = "Select " + portName;
+                        InputBox.Enabled = true;
+                        CheckDataInPort();
                     }
                     catch (UnauthorizedAccessException) {
                         comPort.Close();
-                        comPort = new SerialPort(tmp_name, 9600, Parity.None, 416, StopBits.One);
+                        comPort = new SerialPort(tmp_name, 9600, Parity.None, 8, StopBits.One);
                         comPort.Encoding = Encoding.Unicode;
-                        comPort.Open();
-                        Debug.Text = "Com Port is Closed. \nConnect to " + tmp_name;
+                        if (tmp_name != "Null") { comPort.Open(); }
+                        Debug.Text = portName + " is busy. \nConnect to " + tmp_name;
                         GUIflag--;
                         ComboBox.SelectedItem = tmp_name;
+                        if (tmp_name == "Null") { InputBox.Enabled = false; }
+                        else { InputBox.Enabled = true; }
                     }
-                    catch (IOException) { Debug.Text = "The port response time has expired. \nConnect to " + tmp_name; GUIflag--; ComboBox.SelectedItem = tmp_name; }
+                    catch (IOException) { Debug.Text = "The port response time has expired. \nConnect to " + tmp_name; GUIflag--; ComboBox.SelectedItem = tmp_name; }     //fix
                     finally { mutex.ReleaseMutex(); comPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived); }
                 }
             }
-            if(portName == "None" && tmp_name != null) { comPort.Close(); }
+            if(portName == "Null" && tmp_name == "Null") { GUIflag = 0; return; } 
+            if(portName == "Null" && tmp_name != null) { comPort.Close(); GUIflag--; InputBox.Enabled = false; }
         }
-
-        private void SendButton_Click(object sender, EventArgs e){
-            if (portName != "None")
+        public void CheckDataInPort()
+        {
+            try
             {
-                try
-                {
-                    string writeLine = Convert.ToString(InputBox.Text);
-                    comPort.WriteLine(writeLine);
-                    InputBox.Text = "";
-                    Debug.Text = "send message";
-                }
-                catch (TimeoutException) { MessageBox.Show("Time for send is out", "Error"); }
-                catch (InvalidOperationException) { MessageBox.Show("Port is Close. Select another port", "Error"); }
+                if (comPort.BytesToRead != 0) { OutputBox.Items.Add(comPort.ReadLine()); }
             }
-            else
-            {
-                MessageBox.Show("Select com port", "Warning");
-            }
-        }
-
-        private void Form1_Load(object sender, EventArgs e){
-        }
-
-        private void OutputBox_SelectedIndexChanged(object sender, EventArgs e){
-        }
-
-        private void comboBox_SelectedIndexChanged(object sender, EventArgs e){
+            catch (TimeoutException e) { Debug.Invoke((MethodInvoker)delegate { Debug.Text = "TimeoutException - " + e.Message; }); }
+            catch (ObjectDisposedException e) { Debug.Invoke((MethodInvoker)delegate { Debug.Text = "ObjectDisposedException - " + e.Message; }); }
         }
 
         public void Com2com_FormClosing(object sender, FormClosingEventArgs e){
             readThread.Abort();
             if (comPort != null) { comPort.Close(); }
             System.Environment.Exit(0);
-            System.Environment.FailFast("Exit Error!");
         }
 
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
-
+        private void clrOutputButton_Click(object sender, EventArgs e){
+            OutputBox.Items.Clear();
+            Debug.Text = "The Output was cleared";
         }
 
-        private void InputBox_TextChanged(object sender, EventArgs e) {                 //Send message if click enter 
-            if (InputBox.Text.Length > 0 && portName != "None") {
-                if (InputBox.Text[InputBox.Text.Length - 1] == '\n' && InputBox.Text.TrimEnd('\r', '\n') != "") {
-                    try {
-                        string message = Convert.ToString(InputBox.Text.TrimEnd('\r', '\n'));
-                        comPort.WriteLine(message);
-                        InputBox.Text = null;
-                        Debug.Text = "send message";
-                    }
-                    catch (TimeoutException) { MessageBox.Show("Time for send is out", "Error"); }
-                    catch (InvalidOperationException) { MessageBox.Show("Port is Close. Select another port", "Error"); }
-                }
-            }
-            else if(portName == "None")
-            {
-                MessageBox.Show("Select com port", "Warning", MessageBoxButtons.YesNo);
-            }
+        private void updatePortsButton_Click(object sender, EventArgs e){
+            ComboBox.Items.Clear();
+            ports = SerialPort.GetPortNames();
+            ComboBox.Items.Add("Null");
+            ComboBox.Items.AddRange(ports);
+            GUIflag = 0;
+            ComboBox.SelectedItem = "Null";
+            Debug.Text = "Port list was updated";
         }
     }
 }

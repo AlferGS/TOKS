@@ -30,14 +30,18 @@ namespace com2com
         }
         private void SendButton_Click(object sender, EventArgs e) {
             if (portName != "Null") {
-                try {
-                    string writeLine = Convert.ToString(InputBox.Text);
-                    comPort.WriteLine(writeLine);
-                    InputBox.Text = "";
-                    Debug.Text = "Send message";
+                if (InputBox.Text != "")
+                {
+                    try {
+                        string writeLine = Convert.ToString(InputBox.Text);
+                        writeLine += "\r\n";
+                        comPort.Write(writeLine);
+                        InputBox.Text = "";
+                        Debug.Text = "Message send";
+                    }
+                    catch (InvalidOperationException) { Debug.Text = portName + " is busy. Select another port"; }
+                    catch (TimeoutException) { Debug.Text = "Send time exceeded"; }
                 }
-                catch (InvalidOperationException) { Debug.Text = portName + " is busy. Select another port"; }
-                catch (TimeoutException) { Debug.Text = "Time for send a message is out";  }
             }
             else {
                 Debug.Text = "Select Com port";
@@ -48,13 +52,15 @@ namespace com2com
                 if (InputBox.Text[InputBox.Text.Length - 1] == '\n' && InputBox.Text.TrimEnd('\r', '\n') != "") {
                     try {
                         string message = Convert.ToString(InputBox.Text.TrimEnd('\r', '\n'));
-                        comPort.WriteLine(message);
+                        message += "\r\n";
+                        comPort.Write(message);
                         InputBox.Text = "";
-                        Debug.Text = "Send message";
+                        Debug.Text = "Message send";
                     }
                     catch (InvalidOperationException) { Debug.Text = portName + " is busy. Select another port"; }
-                    catch (TimeoutException) { Debug.Text = "Time for send a message is out"; }
+                    catch (TimeoutException) { Debug.Text = "Send time exceeded"; }
                 }
+                if (InputBox.Text == "\r\n") { InputBox.Clear(); }
             }
             else if(portName == "Null") {
                 Debug.Text = "Select Com port";
@@ -62,7 +68,7 @@ namespace com2com
         }
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e) {        //if received messasge in port, signal to read it
             canRead = true;
-            Debug.Text = "Got message";
+            Debug.Invoke((MethodInvoker)delegate { Debug.Text = "Message received"; });
         }
 
         private void read() {                                        // Thread for check new message in port
@@ -70,7 +76,8 @@ namespace com2com
                 if (canRead) {
                     try {
                         mutex.WaitOne();
-                        OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Items.Add(comPort.ReadLine()); });
+                        //OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Items.Add(comPort.ReadLine()); });
+                        OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Text += comPort.ReadLine() + "\n"; });
                         mutex.ReleaseMutex();
                     }
                     catch (TimeoutException e)        { Debug.Invoke((MethodInvoker)delegate { Debug.Text = "TimeoutException - " + e.Message; }); }
@@ -94,6 +101,7 @@ namespace com2com
                         comPort.Open();
                         Debug.Text = "Select " + portName;
                         InputBox.Enabled = true;
+                        CheckDataInPort();
                     }
                     catch (UnauthorizedAccessException) {
                         comPort.Close();
@@ -106,12 +114,21 @@ namespace com2com
                         if (tmp_name == "Null") { InputBox.Enabled = false; }
                         else { InputBox.Enabled = true; }
                     }
-                    catch (IOException) { Debug.Text = "The port response time has expired. \nConnect to " + tmp_name; GUIflag--; ComboBox.SelectedItem = tmp_name; }     //fix
+                    catch (IOException) { Debug.Text = "Port response time expired. \nConnect to " + tmp_name; GUIflag--; ComboBox.SelectedItem = tmp_name; }     
                     finally { mutex.ReleaseMutex(); comPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived); }
                 }
             }
             if(portName == "Null" && tmp_name == "Null") { GUIflag = 0; return; } 
             if(portName == "Null" && tmp_name != null) { comPort.Close(); GUIflag--; InputBox.Enabled = false; }
+        }
+        public void CheckDataInPort()
+        {
+            try
+            {
+                if (comPort.BytesToRead != 0) { comPort.ReadExisting(); }
+            }
+            catch (TimeoutException e) { Debug.Invoke((MethodInvoker)delegate { Debug.Text = "TimeoutException - " + e.Message; }); }
+            catch (ObjectDisposedException e) { Debug.Invoke((MethodInvoker)delegate { Debug.Text = "ObjectDisposedException - " + e.Message; }); }
         }
         public void Com2com_FormClosing(object sender, FormClosingEventArgs e){
             readThread.Abort();
@@ -120,8 +137,9 @@ namespace com2com
         }
 
         private void clrOutputButton_Click(object sender, EventArgs e){
-            OutputBox.Items.Clear();
-            Debug.Text = "The Output was cleared";
+            //OutputBox.Items.Clear();
+            OutputBox.Text = "";
+            Debug.Text = "Output cleared";
         }
 
         private void updatePortsButton_Click(object sender, EventArgs e){
@@ -131,7 +149,7 @@ namespace com2com
             ComboBox.Items.AddRange(ports);
             GUIflag = 0;
             ComboBox.SelectedItem = "Null";
-            Debug.Text = "Port list was updated";
+            Debug.Text = "Port list updated";
         }
     }
 }

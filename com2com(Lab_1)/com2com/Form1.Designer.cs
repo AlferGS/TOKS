@@ -32,13 +32,13 @@ namespace com2com
             this.InputBox = new System.Windows.Forms.TextBox();
             this.ComboBox = new System.Windows.Forms.ComboBox();
             this.SendButton = new System.Windows.Forms.Button();
-            this.OutputBox = new System.Windows.Forms.ListBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.updatePortsButton = new System.Windows.Forms.Button();
             this.clrOutputButton = new System.Windows.Forms.Button();
             this.Debug = new System.Windows.Forms.RichTextBox();
+            this.OutputBox = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -50,7 +50,7 @@ namespace com2com
             this.InputBox.Location = new System.Drawing.Point(0, 21);
             this.InputBox.Multiline = true;
             this.InputBox.Name = "InputBox";
-            this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.InputBox.Size = new System.Drawing.Size(452, 104);
             this.InputBox.TabIndex = 0;
             this.InputBox.TextChanged += new System.EventHandler(this.InputBox_TextChanged);
@@ -74,18 +74,6 @@ namespace com2com
             this.SendButton.Text = "Send";
             this.SendButton.UseVisualStyleBackColor = true;
             this.SendButton.Click += new System.EventHandler(this.SendButton_Click);
-            // 
-            // OutputBox
-            // 
-            this.OutputBox.FormattingEnabled = true;
-            this.OutputBox.HorizontalScrollbar = true;
-            this.OutputBox.ItemHeight = 16;
-            this.OutputBox.Location = new System.Drawing.Point(0, 21);
-            this.OutputBox.Name = "OutputBox";
-            this.OutputBox.ScrollAlwaysVisible = true;
-            this.OutputBox.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.OutputBox.Size = new System.Drawing.Size(452, 116);
-            this.OutputBox.TabIndex = 4;
             // 
             // groupBox1
             // 
@@ -151,6 +139,16 @@ namespace com2com
             this.Debug.TabIndex = 9;
             this.Debug.Text = "";
             // 
+            // OutputBox
+            // 
+            this.OutputBox.Location = new System.Drawing.Point(6, 21);
+            this.OutputBox.Multiline = true;
+            this.OutputBox.Name = "OutputBox";
+            this.OutputBox.ReadOnly = true;
+            this.OutputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.OutputBox.Size = new System.Drawing.Size(440, 116);
+            this.OutputBox.TabIndex = 5;
+            // 
             // com2com
             // 
             this.ClientSize = new System.Drawing.Size(476, 434);
@@ -167,6 +165,7 @@ namespace com2com
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
@@ -177,7 +176,6 @@ namespace com2com
 
         private System.Windows.Forms.Button SendButton;
         private System.Windows.Forms.ComboBox ComboBox;
-        private System.Windows.Forms.ListBox OutputBox;
         private System.Windows.Forms.TextBox InputBox;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
@@ -185,6 +183,7 @@ namespace com2com
         private System.Windows.Forms.RichTextBox Debug;
         private System.Windows.Forms.Button clrOutputButton;
         private System.Windows.Forms.Button updatePortsButton;
+        private System.Windows.Forms.TextBox OutputBox;
     }
 }
 
