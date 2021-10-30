@@ -47,22 +47,34 @@ namespace com2com
                 Debug.Text = "Select Com port";
             }
         }
-        private void InputBox_TextChanged(object sender, EventArgs e) {                 //Send message if click enter 
-            if (InputBox.Text.Length > 0 && portName != "Null") {
-                if (InputBox.Text[InputBox.Text.Length - 1] == '\n' && InputBox.Text.TrimEnd('\r', '\n') != "") {
-                    try {
+
+        private void InputBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (InputBox.Text.Length > 0 && portName != "Null")
+            {
+                if (e.KeyData == Keys.Enter && e.KeyData != Keys.Shift && InputBox.Text.TrimEnd('\r', '\n') != "")
+                {
+                    try
+                    {
                         string message = Convert.ToString(InputBox.Text.TrimEnd('\r', '\n'));
                         message += "\r\n";
                         comPort.Write(message);
-                        InputBox.Text = "";
                         Debug.Text = "Message send";
+                        InputBox.Clear();
                     }
                     catch (InvalidOperationException) { Debug.Text = portName + " is busy. Select another port"; }
                     catch (TimeoutException) { Debug.Text = "Send time exceeded"; }
+                    e.SuppressKeyPress = true;
                 }
-                if (InputBox.Text == "\r\n") { InputBox.Clear(); }
+                if (InputBox.Text == "\r\n") { e.SuppressKeyPress = true; InputBox.Clear(); }
             }
-            else if(portName == "Null") {
+            if (InputBox.Text == "" && e.KeyData == Keys.Enter) { e.SuppressKeyPress = true; }
+            if (e.KeyData == (Keys.Shift | Keys.Enter))
+            {
+                if (InputBox.Text == "") { e.SuppressKeyPress = true; }
+            }
+            else if (portName == "Null")
+            {
                 Debug.Text = "Select Com port";
             }
         }
@@ -76,8 +88,7 @@ namespace com2com
                 if (canRead) {
                     try {
                         mutex.WaitOne();
-                        //OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Items.Add(comPort.ReadLine()); });
-                        OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Text += comPort.ReadLine() + "\n"; });
+                        OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Text += comPort.ReadExisting() + "\n"; });
                         mutex.ReleaseMutex();
                     }
                     catch (TimeoutException e)        { Debug.Invoke((MethodInvoker)delegate { Debug.Text = "TimeoutException - " + e.Message; }); }
@@ -137,7 +148,6 @@ namespace com2com
         }
 
         private void clrOutputButton_Click(object sender, EventArgs e){
-            //OutputBox.Items.Clear();
             OutputBox.Text = "";
             Debug.Text = "Output cleared";
         }

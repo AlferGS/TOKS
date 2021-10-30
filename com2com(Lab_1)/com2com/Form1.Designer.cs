@@ -34,11 +34,11 @@ namespace com2com
             this.SendButton = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.OutputBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.updatePortsButton = new System.Windows.Forms.Button();
             this.clrOutputButton = new System.Windows.Forms.Button();
             this.Debug = new System.Windows.Forms.RichTextBox();
-            this.OutputBox = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -53,7 +53,7 @@ namespace com2com
             this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.InputBox.Size = new System.Drawing.Size(452, 104);
             this.InputBox.TabIndex = 0;
-            this.InputBox.TextChanged += new System.EventHandler(this.InputBox_TextChanged);
+            this.InputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.InputBox_KeyDown);
             // 
             // ComboBox
             // 
@@ -94,6 +94,16 @@ namespace com2com
             this.groupBox2.TabIndex = 8;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Output";
+            // 
+            // OutputBox
+            // 
+            this.OutputBox.Location = new System.Drawing.Point(6, 21);
+            this.OutputBox.Multiline = true;
+            this.OutputBox.Name = "OutputBox";
+            this.OutputBox.ReadOnly = true;
+            this.OutputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.OutputBox.Size = new System.Drawing.Size(440, 116);
+            this.OutputBox.TabIndex = 5;
             // 
             // groupBox3
             // 
@@ -138,16 +148,6 @@ namespace com2com
             this.Debug.Size = new System.Drawing.Size(186, 110);
             this.Debug.TabIndex = 9;
             this.Debug.Text = "";
-            // 
-            // OutputBox
-            // 
-            this.OutputBox.Location = new System.Drawing.Point(6, 21);
-            this.OutputBox.Multiline = true;
-            this.OutputBox.Name = "OutputBox";
-            this.OutputBox.ReadOnly = true;
-            this.OutputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.OutputBox.Size = new System.Drawing.Size(440, 116);
-            this.OutputBox.TabIndex = 5;
             // 
             // com2com
             // 
