@@ -93,7 +93,6 @@ namespace com2com
                     try {
                         mutex.WaitOne();
                         string message = comPort.ReadExisting() + "\n";
-                        //Debug.Invoke((MethodInvoker)delegate { Debug.Text = message; });        // UnByteStaffing
                         message = byteStaffing.UnByteStuffing(message);
                         OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Text += message; });
                         mutex.ReleaseMutex();
