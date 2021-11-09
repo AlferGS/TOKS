@@ -36,6 +36,7 @@ namespace com2com
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.OutputBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.updatePortsButton = new System.Windows.Forms.Button();
             this.clrOutputButton = new System.Windows.Forms.Button();
             this.Debug = new System.Windows.Forms.RichTextBox();
@@ -47,11 +48,11 @@ namespace com2com
             // InputBox
             // 
             this.InputBox.Enabled = false;
-            this.InputBox.Location = new System.Drawing.Point(0, 21);
+            this.InputBox.Location = new System.Drawing.Point(6, 21);
             this.InputBox.Multiline = true;
             this.InputBox.Name = "InputBox";
             this.InputBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.InputBox.Size = new System.Drawing.Size(452, 104);
+            this.InputBox.Size = new System.Drawing.Size(440, 104);
             this.InputBox.TabIndex = 0;
             this.InputBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.InputBox_KeyDown);
             // 
@@ -59,7 +60,7 @@ namespace com2com
             // 
             this.ComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ComboBox.FormattingEnabled = true;
-            this.ComboBox.Location = new System.Drawing.Point(198, 21);
+            this.ComboBox.Location = new System.Drawing.Point(198, 37);
             this.ComboBox.Name = "ComboBox";
             this.ComboBox.Size = new System.Drawing.Size(121, 24);
             this.ComboBox.TabIndex = 1;
@@ -80,7 +81,7 @@ namespace com2com
             this.groupBox1.Controls.Add(this.InputBox);
             this.groupBox1.Location = new System.Drawing.Point(12, 7);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(452, 125);
+            this.groupBox1.Size = new System.Drawing.Size(452, 131);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Input";
@@ -107,6 +108,7 @@ namespace com2com
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Controls.Add(this.updatePortsButton);
             this.groupBox3.Controls.Add(this.clrOutputButton);
             this.groupBox3.Controls.Add(this.Debug);
@@ -119,13 +121,22 @@ namespace com2com
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Debug&&Control";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(230, 17);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(55, 17);
+            this.label1.TabIndex = 11;
+            this.label1.Text = "Port list";
+            // 
             // updatePortsButton
             // 
             this.updatePortsButton.Location = new System.Drawing.Point(325, 102);
             this.updatePortsButton.Name = "updatePortsButton";
             this.updatePortsButton.Size = new System.Drawing.Size(121, 29);
             this.updatePortsButton.TabIndex = 9;
-            this.updatePortsButton.Text = "Update ports";
+            this.updatePortsButton.Text = "Update port list";
             this.updatePortsButton.UseVisualStyleBackColor = true;
             this.updatePortsButton.Click += new System.EventHandler(this.updatePortsButton_Click);
             // 
@@ -184,6 +195,7 @@ namespace com2com
         private System.Windows.Forms.Button clrOutputButton;
         private System.Windows.Forms.Button updatePortsButton;
         private System.Windows.Forms.TextBox OutputBox;
+        private System.Windows.Forms.Label label1;
     }
 }
 

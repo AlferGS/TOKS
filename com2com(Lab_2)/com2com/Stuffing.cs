@@ -12,18 +12,18 @@ namespace com2com
     {
         private const char flag = 'b';
         private const char Esc = '@';
-        private const char plusEsc = '#';
+        private const char rightEsc = '#';
         private const char notEsc = '&';
 
         public string ByteStuffing(string message, RichTextBox Debug)
         {
-            string tempString = "";
+            string tmpString = "";
             for (int i = 0; i < message.Length; i++)
             {
                 if (message[i] == Esc)              // Find esc symbols
                 {
                     Debug.SelectionStart = Debug.Text.Length;
-                    tempString += "" + Esc + notEsc;
+                    tmpString += "" + Esc + notEsc;
                     Debug.SelectionColor = Color.Green;
                     Debug.AppendText("" + Esc + notEsc);
                     Debug.SelectionColor = Color.Black;
@@ -31,40 +31,40 @@ namespace com2com
                 else if (message[i] == flag)        // Find flag symbols
                 {
                     Debug.SelectionStart = Debug.Text.Length;
-                    tempString += "" + Esc + plusEsc;
+                    tmpString += "" + Esc + rightEsc;
                     Debug.SelectionColor = Color.Red;
-                    Debug.AppendText("" + Esc + plusEsc);
+                    Debug.AppendText("" + Esc + rightEsc);
                     Debug.SelectionColor = Color.Black;
                 }
                 else
                 {
-                    tempString += message[i];
+                    tmpString += message[i];
                     Debug.AppendText(message[i].ToString());
                 }
             }
-            return tempString;
+            return tmpString;
         }
-        public string UnByteStuffing(string message)
+        public string DeByteStuffing(string message)
         {
-            string tempString = "";
+            string tmpString = "";
             for (int i = 0; i < message.Length; i++)
             {
-                if (message[i] == Esc && message[i + 1] == plusEsc)    // Back flag
+                if (message[i] == Esc && message[i + 1] == rightEsc)    // Back flag
                 {
                     i++;
-                    tempString += flag;
+                    tmpString += flag;
                 }
                 else if (message[i] == Esc && message[i + 1] == notEsc)   //Find notEsc
                 {
                     i++;
-                    tempString += Esc;
+                    tmpString += Esc;
                 }
                 else
                 {
-                    tempString += message[i];
+                    tmpString += message[i];
                 }
             }
-            return tempString;
+            return tmpString;
         }
     }
 }

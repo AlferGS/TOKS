@@ -93,7 +93,7 @@ namespace com2com
                     try {
                         mutex.WaitOne();
                         string message = comPort.ReadExisting() + "\n";
-                        message = byteStaffing.UnByteStuffing(message);
+                        message = byteStaffing.DeByteStuffing(message);
                         OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Text += message; });
                         mutex.ReleaseMutex();
                     }
@@ -116,7 +116,7 @@ namespace com2com
                         comPort = new SerialPort(portName, 9600, Parity.None, 8, StopBits.One);
                         comPort.Encoding = Encoding.Unicode;
                         comPort.Open();
-                        Debug.Text = "Select " + portName;
+                        Debug.Text = portName + " selected";
                         InputBox.Enabled = true;
                         CheckDataInPort();
                     }
@@ -124,12 +124,12 @@ namespace com2com
                         comPort.Close();
                         comPort = new SerialPort(tmp_name, 9600, Parity.None, 8, StopBits.One);
                         comPort.Encoding = Encoding.Unicode;
-                        if (tmp_name != "Null") { comPort.Open(); }
-                        Debug.Text = portName + " is busy. \nConnect to " + tmp_name;
+                        Debug.Text = portName + " is busy.";
+                        if (tmp_name != "Null") { comPort.Open();
+                        Debug.Text += "\nConnect to " + tmp_name; }
                         GUIflag--;
                         ComboBox.SelectedItem = tmp_name;
-                        if (tmp_name == "Null") { InputBox.Enabled = false; }
-                        else { InputBox.Enabled = true; }
+                        InputBox.Enabled = (tmp_name == "Null") ? false : true;
                     }
                     catch (IOException) { Debug.Text = "Port response time expired. \nConnect to " + tmp_name; GUIflag--; ComboBox.SelectedItem = tmp_name; }     
                     finally { mutex.ReleaseMutex(); comPort.DataReceived += new SerialDataReceivedEventHandler(serialPort_DataReceived); }

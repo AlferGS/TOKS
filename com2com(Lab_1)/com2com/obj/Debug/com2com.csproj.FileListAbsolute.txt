@@ -17,7 +17,6 @@ D:\Projects C#\Toks\TOKS\com2com(Lab_1)\com2com\obj\Debug\com2com.csproj.Generat
 D:\Projects C#\Toks\TOKS\com2com(Lab_1)\com2com\obj\Debug\com2com.csproj.CoreCompileInputs.cache
 D:\Projects C#\Toks\TOKS\com2com(Lab_1)\com2com\obj\Debug\com2com.exe
 D:\Projects C#\Toks\TOKS\com2com(Lab_1)\com2com\obj\Debug\com2com.pdb
-D:\Projects C#\Toks\TOKS\com2com(Lab_1)\com2com\obj\Debug\com2com.csproj.AssemblyReference.cache
 D:\Projects C#\Toks\com2com(Lab_1)\com2com\bin\Debug\com2com.exe.config
 D:\Projects C#\Toks\com2com(Lab_1)\com2com\bin\Debug\com2com.exe
 D:\Projects C#\Toks\com2com(Lab_1)\com2com\bin\Debug\com2com.pdb
