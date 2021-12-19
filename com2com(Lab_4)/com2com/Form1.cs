@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Text;
 using System.Windows.Forms;
-
 using System.IO;
 using System.IO.Ports;
 using System.Threading;
@@ -17,7 +16,7 @@ namespace com2com
         static bool canRead = false;
         static Mutex mutex = new Mutex();
         static string[] ports = SerialPort.GetPortNames();
-        private CyclicCode cyclicCode;
+        private CSMA csma = new CSMA();
         public com2com() {
             InitializeComponent();
             this.FormClosing += Com2com_FormClosing;
@@ -28,27 +27,17 @@ namespace com2com
             GUIflag--;
             readThread = new Thread(read);
             readThread.Start();
-            cyclicCode = new CyclicCode();
         }
-      
         private void SendButton_Click(object sender, EventArgs e) {
             if (portName != "Null") {
                 if (InputBox.Text != "")
                 {
                     try {
-                        string writeLine = Convert.ToString(InputBox.Text);
-                        string newMessage = cyclicCode.StringToBiteString(writeLine);
-                        Console.WriteLine(newMessage + ". coding this string");
-                        Console.WriteLine("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-                        string codingString = cyclicCode.CodingBiteString(newMessage);
-                        Console.WriteLine("coded string: " + codingString);
-                        Console.WriteLine("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-                        string afterMistake = cyclicCode.MakeMistake(codingString);
-                        Console.WriteLine("mistaked string: " + Convert.ToString(afterMistake));
-                        Console.WriteLine("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-                        comPort.Write(afterMistake);
-                        InputBox.Text = "";
                         Debug.Text = "Message send";
+                        string writeLine = Convert.ToString(InputBox.Text) + "\r\n";
+                        csma.StringToCharArray(writeLine);
+                        csma.SendMessage(comPort, Debug);
+                        InputBox.Text = "";
                     }
                     catch (InvalidOperationException) { Debug.Text = portName + " is busy. Select another port"; }
                     catch (TimeoutException) { Debug.Text = "Send time exceeded"; }
@@ -67,18 +56,10 @@ namespace com2com
                 {
                     try
                     {
-                        string message = Convert.ToString(InputBox.Text.TrimEnd('\r', '\n'));
-                        string newMessage = cyclicCode.StringToBiteString(message);
-                        Console.WriteLine(newMessage + ". coding this string");
-                        Console.WriteLine("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-                        string codingString = cyclicCode.CodingBiteString(newMessage);
-                        Console.WriteLine("coded string: " + codingString);
-                        Console.WriteLine("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-                        string afterMistake = cyclicCode.MakeMistake(codingString);
-                        Console.WriteLine("mistaked string: " + Convert.ToString(afterMistake));
-                        Console.WriteLine("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
-                        comPort.Write(afterMistake);
                         Debug.Text = "Message send";
+                        string message = Convert.ToString(InputBox.Text.TrimEnd('\r', '\n')) + "\r\n";
+                        csma.StringToCharArray(message);
+                        csma.SendMessage(comPort, Debug);
                         InputBox.Clear();
                     }
                     catch (InvalidOperationException) { Debug.Text = portName + " is busy. Select another port"; }
@@ -99,7 +80,7 @@ namespace com2com
         }
         private void serialPort_DataReceived(object sender, SerialDataReceivedEventArgs e) {        //if received messasge in port, signal to read it
             canRead = true;
-            Debug.Invoke((MethodInvoker)delegate { Debug.Text = "Message received\n"; });
+            Debug.Invoke((MethodInvoker)delegate { Debug.Text = "Message received"; });
         }
 
         private void read() {                                        // Thread for check new message in port
@@ -107,16 +88,7 @@ namespace com2com
                 if (canRead) {
                     try {
                         mutex.WaitOne();
-                        OutputBox.Invoke((MethodInvoker)delegate {
-                            string decodeString = cyclicCode.DecodingBiteString(comPort.ReadExisting());
-                            string result = cyclicCode.BiteStringToString(decodeString);
-                            OutputBox.Text += result + "\r\n";
-                        });
-                        Debug.Invoke((MethodInvoker)delegate
-                        {
-                            //Debug.Text += cyclicCode.debugString;
-                            Debug.Text += cyclicCode.debugString;
-                        });
+                        OutputBox.Invoke((MethodInvoker)delegate { OutputBox.Text += comPort.ReadExisting(); });
                         mutex.ReleaseMutex();
                     }
                     catch (TimeoutException e)        { Debug.Invoke((MethodInvoker)delegate { Debug.Text = "TimeoutException - " + e.Message; }); }
@@ -188,10 +160,6 @@ namespace com2com
             GUIflag = 0;
             ComboBox.SelectedItem = "Null";
             Debug.Text = "Port list updated";
-        }
-
-        private string DebugOut(){
-            return "\n" + cyclicCode.debugString;
         }
     }
 }

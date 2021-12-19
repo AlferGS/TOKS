@@ -40,7 +40,6 @@ namespace com2com
             this.updatePortsButton = new System.Windows.Forms.Button();
             this.clrOutputButton = new System.Windows.Forms.Button();
             this.Debug = new System.Windows.Forms.RichTextBox();
-            //this.button1 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -82,7 +81,7 @@ namespace com2com
             this.groupBox1.Controls.Add(this.InputBox);
             this.groupBox1.Location = new System.Drawing.Point(12, 7);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(452, 130);
+            this.groupBox1.Size = new System.Drawing.Size(452, 131);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Input";
@@ -109,7 +108,6 @@ namespace com2com
             // 
             // groupBox3
             // 
-            //this.groupBox3.Controls.Add(this.button1);
             this.groupBox3.Controls.Add(this.label1);
             this.groupBox3.Controls.Add(this.updatePortsButton);
             this.groupBox3.Controls.Add(this.clrOutputButton);
@@ -161,18 +159,7 @@ namespace com2com
             this.Debug.Size = new System.Drawing.Size(186, 110);
             this.Debug.TabIndex = 9;
             this.Debug.Text = "";
-            //// 
-            //// button1
-            //// 
-            //this.button1.Location = new System.Drawing.Point(219, 90);
-            //this.button1.Name = "button1";
-            //this.button1.Size = new System.Drawing.Size(75, 41);
-            //this.button1.TabIndex = 1;
-            //this.button1.Text = "Пук-Пук";
-            //this.button1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            //this.button1.UseVisualStyleBackColor = true;
-            //this.button1.Click += new System.EventHandler(this.button1_Click);
-            //// 
+            // 
             // com2com
             // 
             this.ClientSize = new System.Drawing.Size(476, 434);
@@ -209,7 +196,6 @@ namespace com2com
         private System.Windows.Forms.Button updatePortsButton;
         private System.Windows.Forms.TextBox OutputBox;
         private System.Windows.Forms.Label label1;
-        //private System.Windows.Forms.Button button1;
     }
 }
 
